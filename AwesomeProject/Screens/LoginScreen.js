@@ -3,13 +3,12 @@ import {
   View,
   ImageBackground,
   Text,
-  Pressable,
+  TouchableOpacity,
   TextInput,
   Keyboard,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Platform,
-  Alert,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -45,7 +44,8 @@ export default function LoginScreen() {
   // });
 
   const onLogin = () => {
-    Alert.alert("Credentials", `${mail} + ${password}`);
+    console.log("Login:", `${mail}`);
+    console.log("Password:", `${password}`);
   };
 
   return (
@@ -86,23 +86,27 @@ export default function LoginScreen() {
               />
             </KeyboardAvoidingView>
 
-            <Pressable style={styles.btnShow}>
+            <TouchableOpacity style={styles.btnShow}>
               <Text style={styles.textShow}>Показати</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
 
           <View>
-            <Pressable style={styles.btnAuth} title="Login" onPress={onLogin}>
+            <TouchableOpacity
+              style={styles.btnAuth}
+              title="Login"
+              onPress={onLogin}
+            >
               <Text style={styles.txtBtnAuth}>Увійти</Text>
-            </Pressable>
+            </TouchableOpacity>
 
-            <Pressable
+            <TouchableOpacity
               style={styles.reBtnReg}
               onPress={() => navigation.navigate("RegistrationScreen")}
             >
               <Text style={styles.txtBtnAuth1}>Немає акаунту?</Text>
               <Text style={styles.txtBtnAuth2}>Зареєструватися</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
       </View>

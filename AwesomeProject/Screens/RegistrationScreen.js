@@ -4,12 +4,12 @@ import {
   ImageBackground,
   Text,
   Pressable,
+  TouchableOpacity,
   TextInput,
   Keyboard,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Platform,
-  Alert,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -46,7 +46,9 @@ export default function RegistrationScreen() {
   // });
 
   const onRegistration = () => {
-    Alert.alert("Credentials", `${login} + ${mail} + ${password}`);
+    console.log("Login:", `${login}`);
+    console.log("E-mail:", `${mail}`);
+    console.log("Password:", `${password}`);
   };
 
   return (
@@ -95,22 +97,24 @@ export default function RegistrationScreen() {
               />
             </KeyboardAvoidingView>
 
-            <Pressable style={styles.btnShow}>
+            <TouchableOpacity style={styles.btnShow}>
               <Text style={styles.textShow}>Показати</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
           <View>
-            <Pressable
+            <TouchableOpacity
               style={styles.btnReg}
               title="Registration"
               onPress={onRegistration}
             >
               <Text style={styles.txtBtnReg}>Зареєстуватися</Text>
-            </Pressable>
+            </TouchableOpacity>
 
-            <Pressable onPress={() => navigation.navigate("LoginScreen")}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("LoginScreen")}
+            >
               <Text style={styles.txtBtnAuth}>Вже є акаунт? Увійти</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
       </View>

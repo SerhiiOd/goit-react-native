@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
   Platform,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
 const imageBg = require("../assets/images/photo-bg.png");

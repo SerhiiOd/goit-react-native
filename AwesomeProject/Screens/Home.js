@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import PostsScreen from "./PostsScreen";
 import CreatePostsScreen from "./PostsScreen";
 import ProfileScreen from "./PostsScreen";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 
 const Tabs = createBottomTabNavigator();
 

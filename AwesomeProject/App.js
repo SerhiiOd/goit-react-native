@@ -3,8 +3,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import "react-native-gesture-handler";
 import React from "react";
-import { MaterialIcons } from "@expo/vector-icons";
-import { StyleSheet, TouchableOpacity } from "react-native";
 
 // You can import from local files
 
@@ -26,17 +24,6 @@ export default function App() {
     return null;
   }
 
-  // const headerLogout = () => {
-  //   return (
-  //     <TouchableOpacity
-  //       style={styles.logoutBtn}
-  //       onPress={() => console.log("Button pressed")}
-  //     >
-  //       <MaterialIcons name="logout" size={24} color="#BDBDBD" />
-  //     </TouchableOpacity>
-  //   );
-  // };
-
   return (
     <NavigationContainer>
       <MainStack.Navigator>
@@ -53,20 +40,9 @@ export default function App() {
         <MainStack.Screen
           name="Home"
           component={Home}
-          // options={{
-          //   title: "Публікації",
-          //   headerTitleAlign: "center",
-          //   headerRight: headerLogout,
-          // }}
           options={{ headerShown: false }}
         />
       </MainStack.Navigator>
     </NavigationContainer>
   );
 }
-
-// const styles = StyleSheet.create({
-//   logoutBtn: {
-//     right: 16,
-//   },
-// });

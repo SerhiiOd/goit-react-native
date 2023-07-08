@@ -3,7 +3,6 @@ import {
   View,
   ImageBackground,
   Text,
-  Pressable,
   TouchableOpacity,
   TextInput,
   Keyboard,
@@ -13,6 +12,7 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { AntDesign } from "@expo/vector-icons";
 
 const imageBg = require("../assets/images/photo-bg.png");
 
@@ -20,35 +20,62 @@ export default function RegistrationScreen() {
   const [login, setLogin] = useState("");
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
-  // const [isShowPassword, setIsShowPassword] = useState(true);
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigation = useNavigation();
 
-  // useEffect(() => {
-  //   const keyboardDidShowListener = Keyboard.addListener(
-  //     "keyboardDidShow",
-  //     () => {
-  //       setShowKeyboard(true);
-  //     }
-  //   );
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {};
+    const re =
+      /^[a-z][a-zA-Z0-9_.]*(\.[a-zA-Z][a-zA-Z0-9_.]*)?@[a-z][a-zA-Z-0-9]*\.[a-z]+(\.[a-z]+)?$/;
 
-  //   const keyboardDidHideListener = Keyboard.addListener(
-  //     "keyboardDidHide",
-  //     () => {
-  //       setShowKeyboard(true);
-  //     }
-  //   );
+    if (login.trim() === "") {
+      newErrors.login = "Введите логин";
+      isValid = false;
+    }
 
-  //   return () => {
-  //     keyboardDidShowListener.remove();
-  //     keyboardDidHideListener.remove();
-  //   };
-  // });
+    if (mail.trim() === "") {
+      newErrors.mail = "Введите адрес электронной почты";
+      isValid = false;
+    } else if (!re.test(String(mail).toLowerCase())) {
+      newErrors.mail = "Неверный формат почты";
+      isValid = false;
+    }
+
+    if (password.trim() === "") {
+      newErrors.password = "Введите пароль";
+      isValid = false;
+    } else if (password.trim().length < 7) {
+      newErrors.password = "Минимум 7 символов";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   const onRegistration = () => {
-    console.log("Login:", `${login}`);
-    console.log("E-mail:", `${mail}`);
-    console.log("Password:", `${password}`);
+    if (validateForm()) {
+      const registrationData = {
+        login,
+        mail,
+        password,
+      };
+
+      console.log(registrationData);
+
+      navigation.navigate("Home");
+    } else {
+      console.log("Форма не прошла валидацию. Пожалуйста, исправьте ошибки.");
+
+      setPassword("");
+    }
   };
 
   return (
@@ -64,7 +91,16 @@ export default function RegistrationScreen() {
           }}
         />
         <View style={styles.blockReg}>
-          <View style={styles.avatar}></View>
+          <View style={styles.avatar}>
+            <TouchableOpacity style={styles.avaBtn}>
+              <AntDesign
+                style={styles.avaBtnSvg}
+                name="pluscircleo"
+                size={24}
+                color="#FF6C00"
+              />
+            </TouchableOpacity>
+          </View>
 
           <View style={styles.divTextReg}>
             <Text style={styles.textReg}>Реєстрація</Text>
@@ -79,25 +115,40 @@ export default function RegistrationScreen() {
                 placeholder="Логін"
                 value={login}
                 onChangeText={setLogin}
+                autoFocus={true}
               />
+              {errors.login && (
+                <Text style={styles.errorLogin}>{errors.login}</Text>
+              )}
 
               <TextInput
                 style={styles.regInput}
                 placeholder="Адреса електронної пошти"
                 value={mail}
                 onChangeText={setMail}
+                autoFocus={true}
               />
+              {errors.mail && (
+                <Text style={styles.errorMail}>{errors.mail}</Text>
+              )}
 
               <TextInput
                 style={styles.regInput}
                 placeholder="Пароль"
                 value={password}
                 onChangeText={setPassword}
-                secureTextEntry
+                secureTextEntry={!showPassword}
+                autoFocus={true}
               />
+              {errors.password && (
+                <Text style={styles.errorPass}>{errors.password}</Text>
+              )}
             </KeyboardAvoidingView>
 
-            <TouchableOpacity style={styles.btnShow}>
+            <TouchableOpacity
+              style={styles.btnShow}
+              onPress={toggleShowPassword}
+            >
               <Text style={styles.textShow}>Показати</Text>
             </TouchableOpacity>
           </View>
@@ -132,7 +183,6 @@ const styles = StyleSheet.create({
     top: 200,
     height: 549,
     width: "auto",
-    // paddingTop: 92,
     paddingRight: 16,
     paddingBottom: 45,
     paddingLeft: 16,
@@ -149,12 +199,22 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: "#F6F6F6",
   },
+  avaBtn: {
+    position: "absolute",
+    top: 70,
+    left: 105,
+    width: 30,
+    height: 30,
+    justifyContent: "center",
+  },
+  avaBtnSvg: {
+    textAlign: "center",
+  },
   divTextReg: {
     top: -33,
   },
   textReg: {
-    fontFamily: "Roboto",
-    fontWeight: 500,
+    fontFamily: "Roboto_500Medium",
     fontSize: 30,
     textAlign: "center",
     color: "#212121",
@@ -172,14 +232,14 @@ const styles = StyleSheet.create({
     borderColor: "#E8E8E8",
   },
   btnShow: {
-    right: 16,
     bottom: 50,
+    left: 255,
+    width: 72,
+    height: 19,
   },
   textShow: {
-    fontFamily: "Roboto",
-    fontWeight: 400,
+    fontFamily: "Roboto_400Regular",
     fontSize: 16,
-    textAlign: "right",
     color: "#1B4371",
   },
   btnReg: {
@@ -197,17 +257,33 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF6C00",
   },
   txtBtnReg: {
-    fontFamily: "Roboto",
-    fontWeight: 400,
+    fontFamily: "Roboto_400Regular",
     fontSize: 16,
     textAlign: "center",
     color: "#fff",
   },
   txtBtnAuth: {
-    fontFamily: "Roboto",
-    fontWeight: 400,
+    fontFamily: "Roboto_400Regular",
     fontSize: 16,
     textAlign: "center",
     color: "#1B4371",
+  },
+  errorLogin: {
+    position: "absolute",
+    top: 49,
+    left: 16,
+    color: "red",
+  },
+  errorMail: {
+    position: "absolute",
+    top: 115,
+    left: 16,
+    color: "red",
+  },
+  errorPass: {
+    position: "absolute",
+    top: 180,
+    left: 16,
+    color: "red",
   },
 });

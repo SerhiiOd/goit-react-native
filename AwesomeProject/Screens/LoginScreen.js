@@ -18,34 +18,56 @@ const imageBg = require("../assets/images/photo-bg.png");
 export default function LoginScreen() {
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
-  // const [isShowPassword, setIsShowPassword] = useState(true);
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigation = useNavigation();
 
-  // useEffect(() => {
-  //   const keyboardDidShowListener = Keyboard.addListener(
-  //     "keyboardDidShow",
-  //     () => {
-  //       setShowKeyboard(true);
-  //     }
-  //   );
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {};
+    const re =
+      /^[a-z][a-zA-Z0-9_.]*(\.[a-zA-Z][a-zA-Z0-9_.]*)?@[a-z][a-zA-Z-0-9]*\.[a-z]+(\.[a-z]+)?$/;
 
-  //   const keyboardDidHideListener = Keyboard.addListener(
-  //     "keyboardDidHide",
-  //     () => {
-  //       setShowKeyboard(true);
-  //     }
-  //   );
+    if (mail.trim() === "") {
+      newErrors.mail = "Введите адрес электронной почты";
+      isValid = false;
+    } else if (!re.test(String(mail).toLowerCase())) {
+      newErrors.mail = "Неверный формат почты";
+      isValid = false;
+    }
 
-  //   return () => {
-  //     keyboardDidShowListener.remove();
-  //     keyboardDidHideListener.remove();
-  //   };
-  // });
+    if (password.trim() === "") {
+      newErrors.password = "Введите пароль";
+      isValid = false;
+    } else if (password.trim().length < 7) {
+      newErrors.password = "Минимум 7 символов";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   const onLogin = () => {
-    console.log("Login:", `${mail}`);
-    console.log("Password:", `${password}`);
+    if (validateForm()) {
+      const registrationData = {
+        mail,
+        password,
+      };
+
+      console.log(registrationData);
+
+      navigation.navigate("Home");
+    } else {
+      console.log("Форма не прошла валидацию. Пожалуйста, исправьте ошибки.");
+
+      setPassword("");
+    }
   };
 
   return (
@@ -63,7 +85,7 @@ export default function LoginScreen() {
 
         <View style={styles.authBlock}>
           <View style={styles.divTextAuth}>
-            <Text style={styles.textAuth}>Реєстрація</Text>
+            <Text style={styles.textAuth}>Увійти</Text>
           </View>
 
           <View>
@@ -75,18 +97,29 @@ export default function LoginScreen() {
                 placeholder="Адреса електронної пошти"
                 value={mail}
                 onChangeText={setMail}
+                autoFocus={true}
               />
+              {errors.mail && (
+                <Text style={styles.errorMail}>{errors.mail}</Text>
+              )}
 
               <TextInput
                 style={styles.authInput}
                 placeholder="Пароль"
                 value={password}
                 onChangeText={setPassword}
-                secureTextEntry
+                secureTextEntry={!showPassword}
+                autoFocus={true}
               />
+              {errors.password && (
+                <Text style={styles.errorPass}>{errors.password}</Text>
+              )}
             </KeyboardAvoidingView>
 
-            <TouchableOpacity style={styles.btnShow}>
+            <TouchableOpacity
+              style={styles.btnShow}
+              onPress={toggleShowPassword}
+            >
               <Text style={styles.textShow}>Показати</Text>
             </TouchableOpacity>
           </View>
@@ -138,8 +171,7 @@ const styles = StyleSheet.create({
     marginBottom: 33,
   },
   textAuth: {
-    fontFamily: "Roboto",
-    fontWeight: 500,
+    fontFamily: "Roboto_500Medium",
     fontSize: 30,
     textAlign: "center",
     color: "#212121",
@@ -157,14 +189,14 @@ const styles = StyleSheet.create({
     borderColor: "#E8E8E8",
   },
   btnShow: {
-    right: 16,
     bottom: 50,
+    left: 255,
+    width: 72,
+    height: 19,
   },
   textShow: {
-    fontFamily: "Roboto",
-    fontWeight: 400,
+    fontFamily: "Roboto_400Regular",
     fontSize: 16,
-    textAlign: "right",
     color: "#1B4371",
   },
   btnAuth: {
@@ -182,8 +214,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF6C00",
   },
   txtBtnAuth: {
-    fontFamily: "Roboto",
-    fontWeight: 400,
+    fontFamily: "Roboto_400Regular",
     fontSize: 16,
     textAlign: "center",
     color: "#fff",
@@ -194,19 +225,29 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   txtBtnAuth1: {
-    fontFamily: "Roboto",
-    fontWeight: 400,
+    fontFamily: "Roboto_400Regular",
     fontSize: 16,
     textAlign: "center",
     color: "#1B4371",
     marginRight: 5,
   },
   txtBtnAuth2: {
-    fontFamily: "Roboto",
-    fontWeight: 400,
+    fontFamily: "Roboto_400Regular",
     fontSize: 16,
     textAlign: "center",
     color: "#1B4371",
     textDecorationLine: "underline",
+  },
+  errorMail: {
+    position: "absolute",
+    top: 49,
+    left: 16,
+    color: "red",
+  },
+  errorPass: {
+    position: "absolute",
+    top: 115,
+    left: 16,
+    color: "red",
   },
 });

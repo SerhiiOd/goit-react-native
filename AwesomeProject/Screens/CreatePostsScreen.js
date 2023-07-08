@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
 
-export default function PostsScreen() {
+export default function CreatePostsScreen() {
   return <View style={styles.container}></View>;
 }
 

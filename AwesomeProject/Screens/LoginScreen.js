@@ -97,7 +97,6 @@ export default function LoginScreen() {
                 placeholder="Адреса електронної пошти"
                 value={mail}
                 onChangeText={setMail}
-                autoFocus={true}
               />
               {errors.mail && (
                 <Text style={styles.errorMail}>{errors.mail}</Text>
@@ -109,7 +108,6 @@ export default function LoginScreen() {
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
-                autoFocus={true}
               />
               {errors.password && (
                 <Text style={styles.errorPass}>{errors.password}</Text>

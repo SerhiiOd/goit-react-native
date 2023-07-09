@@ -1,6 +1,7 @@
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { useNavigation } from "@react-navigation/native";
 import PostsScreen from "./PostsScreen";
 import CreatePostsScreen from "./PostsScreen";
 import ProfileScreen from "./PostsScreen";
@@ -9,11 +10,13 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 const Tabs = createBottomTabNavigator();
 
 export default function Home() {
+  const navigation = useNavigation();
+
   const headerLogout = () => {
     return (
       <TouchableOpacity
         style={styles.logoutBtn}
-        onPress={() => console.log("Button pressed")}
+        onPress={() => navigation.navigate("LoginScreen")}
       >
         <MaterialIcons name="logout" size={24} color="#BDBDBD" />
       </TouchableOpacity>

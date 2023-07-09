@@ -115,7 +115,6 @@ export default function RegistrationScreen() {
                 placeholder="Логін"
                 value={login}
                 onChangeText={setLogin}
-                autoFocus={true}
               />
               {errors.login && (
                 <Text style={styles.errorLogin}>{errors.login}</Text>
@@ -126,7 +125,6 @@ export default function RegistrationScreen() {
                 placeholder="Адреса електронної пошти"
                 value={mail}
                 onChangeText={setMail}
-                autoFocus={true}
               />
               {errors.mail && (
                 <Text style={styles.errorMail}>{errors.mail}</Text>
@@ -138,7 +136,6 @@ export default function RegistrationScreen() {
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
-                autoFocus={true}
               />
               {errors.password && (
                 <Text style={styles.errorPass}>{errors.password}</Text>

@@ -3,16 +3,20 @@ import {
   View,
   ImageBackground,
   Text,
+  Image,
   TouchableOpacity,
   TextInput,
   Keyboard,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Platform,
+  Alert,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
+import { registerUser } from "../Memory/Memory";
+import * as ImagePicker from "expo-image-picker";
 
 const imageBg = require("../assets/images/photo-bg.png");
 
@@ -22,6 +26,7 @@ export default function RegistrationScreen() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [avatar, setAvatar] = useState(null);
 
   const navigation = useNavigation();
 
@@ -56,6 +61,31 @@ export default function RegistrationScreen() {
     return isValid;
   };
 
+  const handleAvatarSelect = async () => {
+    try {
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        alert("Необходимо предоставить разрешение для доступа к галерее.");
+        return;
+      }
+
+      const pickerResult = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!pickerResult.canceled) {
+        // Обновляем состояние с выбранным изображением
+        setAvatar(pickerResult.assets[0].uri); // используем "assets" массив
+      }
+    } catch (error) {
+      console.log("Ошибка выбора изображения:", error);
+    }
+  };
+
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -66,14 +96,18 @@ export default function RegistrationScreen() {
         login,
         mail,
         password,
+        avatar, // Включаем выбранный аватар в данные регистрации
       };
 
-      console.log(registrationData);
-
-      navigation.navigate("Home");
+      if (registerUser(login, mail, password)) {
+        Alert.alert("Пользователь успешно зарегистрирован.");
+        navigation.navigate("Home");
+      } else {
+        Alert.alert("Пользователь с таким логином или почтой уже существует.");
+        setPassword("");
+      }
     } else {
-      console.log("Форма не прошла валидацию. Пожалуйста, исправьте ошибки.");
-
+      Alert.alert("Форма не прошла валидацию. Пожалуйста, исправьте ошибки.");
       setPassword("");
     }
   };
@@ -92,13 +126,17 @@ export default function RegistrationScreen() {
         />
         <View style={styles.blockReg}>
           <View style={styles.avatar}>
-            <TouchableOpacity style={styles.avaBtn}>
-              <AntDesign
-                style={styles.avaBtnSvg}
-                name="pluscircleo"
-                size={24}
-                color="#FF6C00"
-              />
+            {/* Здесь отображается выбранная аватарка или дефолтное изображение */}
+            {avatar ? (
+              <Image source={{ uri: avatar }} style={styles.avatarImage} />
+            ) : null}
+
+            {/* Кнопка для выбора аватарки */}
+            <TouchableOpacity
+              style={styles.avaBtn}
+              onPress={handleAvatarSelect}
+            >
+              <AntDesign name="pluscircleo" size={24} color="#FF6C00" />
             </TouchableOpacity>
           </View>
 
@@ -194,7 +232,15 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#F6F6F6",
+  },
+  avatarImage: {
+    width: 120,
+    height: 120,
+
+    borderWidth: 2,
   },
   avaBtn: {
     position: "absolute",

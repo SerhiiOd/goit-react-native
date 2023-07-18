@@ -9,9 +9,11 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Platform,
+  Alert,
 } from "react-native";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { loginUser } from "../Memory/Memory";
 
 const imageBg = require("../assets/images/photo-bg.png");
 
@@ -55,17 +57,18 @@ export default function LoginScreen() {
 
   const onLogin = () => {
     if (validateForm()) {
-      const registrationData = {
-        mail,
-        password,
-      };
-
-      console.log(registrationData);
-
-      navigation.navigate("Home");
+      const user = loginUser(mail, password);
+      if (user) {
+        console.log("Пользователь успешно вошел в систему:", user);
+        navigation.navigate("Home");
+      } else {
+        Alert.alert(
+          "Неверные данные. Пожалуйста, проверьте введенный адрес электронной почты и пароль."
+        );
+        setPassword("");
+      }
     } else {
-      console.log("Форма не прошла валидацию. Пожалуйста, исправьте ошибки.");
-
+      Alert.alert("Форма не прошла валидацию. Пожалуйста, исправьте ошибки.");
       setPassword("");
     }
   };

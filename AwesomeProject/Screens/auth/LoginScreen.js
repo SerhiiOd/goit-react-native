@@ -3,7 +3,6 @@ import {
   View,
   ImageBackground,
   Text,
-  Image,
   TouchableOpacity,
   TextInput,
   Keyboard,
@@ -14,19 +13,15 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { AntDesign } from "@expo/vector-icons";
-import { registerUser } from "../Memory/Memory";
-import * as ImagePicker from "expo-image-picker";
+import { loginUser } from "../../Memory/Memory";
 
-const imageBg = require("../assets/images/photo-bg.png");
+const imageBg = require("../../assets/images/photo-bg.png");
 
-export default function RegistrationScreen() {
-  const [login, setLogin] = useState("");
+export default function LoginScreen() {
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  const [avatar, setAvatar] = useState(null);
 
   const navigation = useNavigation();
 
@@ -35,11 +30,6 @@ export default function RegistrationScreen() {
     const newErrors = {};
     const re =
       /^[a-z][a-zA-Z0-9_.]*(\.[a-zA-Z][a-zA-Z0-9_.]*)?@[a-z][a-zA-Z-0-9]*\.[a-z]+(\.[a-z]+)?$/;
-
-    if (login.trim() === "") {
-      newErrors.login = "Введите логин";
-      isValid = false;
-    }
 
     if (mail.trim() === "") {
       newErrors.mail = "Введите адрес электронной почты";
@@ -61,49 +51,20 @@ export default function RegistrationScreen() {
     return isValid;
   };
 
-  const handleAvatarSelect = async () => {
-    try {
-      const permissionResult =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!permissionResult.granted) {
-        alert("Необходимо предоставить разрешение для доступа к галерее.");
-        return;
-      }
-
-      const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      });
-
-      if (!pickerResult.canceled) {
-        // Обновляем состояние с выбранным изображением
-        setAvatar(pickerResult.assets[0].uri); // используем "assets" массив
-      }
-    } catch (error) {
-      console.log("Ошибка выбора изображения:", error);
-    }
-  };
-
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const onRegistration = () => {
+  const onLogin = () => {
     if (validateForm()) {
-      const registrationData = {
-        login,
-        mail,
-        password,
-        avatar, // Включаем выбранный аватар в данные регистрации
-      };
-
-      if (registerUser(login, mail, password)) {
-        Alert.alert("Пользователь успешно зарегистрирован.");
+      const user = loginUser(mail, password);
+      if (user) {
+        console.log("Пользователь успешно вошел в систему:", user);
         navigation.navigate("Home");
       } else {
-        Alert.alert("Пользователь с таким логином или почтой уже существует.");
+        Alert.alert(
+          "Неверные данные. Пожалуйста, проверьте введенный адрес электронной почты и пароль."
+        );
         setPassword("");
       }
     } else {
@@ -124,42 +85,18 @@ export default function RegistrationScreen() {
             height: "100%",
           }}
         />
-        <View style={styles.blockReg}>
-          <View style={styles.avatar}>
-            {/* Здесь отображается выбранная аватарка или дефолтное изображение */}
-            {avatar ? (
-              <Image source={{ uri: avatar }} style={styles.avatarImage} />
-            ) : null}
 
-            {/* Кнопка для выбора аватарки */}
-            <TouchableOpacity
-              style={styles.avaBtn}
-              onPress={handleAvatarSelect}
-            >
-              <AntDesign name="pluscircleo" size={24} color="#FF6C00" />
-            </TouchableOpacity>
+        <View style={styles.authBlock}>
+          <View style={styles.divTextAuth}>
+            <Text style={styles.textAuth}>Увійти</Text>
           </View>
 
-          <View style={styles.divTextReg}>
-            <Text style={styles.textReg}>Реєстрація</Text>
-          </View>
           <View>
             <KeyboardAvoidingView
               behavior={Platform.OS == "ios" ? "padding" : "height"}
-              style={styles.keyboardInp}
             >
               <TextInput
-                style={styles.regInput}
-                placeholder="Логін"
-                value={login}
-                onChangeText={setLogin}
-              />
-              {errors.login && (
-                <Text style={styles.errorLogin}>{errors.login}</Text>
-              )}
-
-              <TextInput
-                style={styles.regInput}
+                style={styles.authInput}
                 placeholder="Адреса електронної пошти"
                 value={mail}
                 onChangeText={setMail}
@@ -169,7 +106,7 @@ export default function RegistrationScreen() {
               )}
 
               <TextInput
-                style={styles.regInput}
+                style={styles.authInput}
                 placeholder="Пароль"
                 value={password}
                 onChangeText={setPassword}
@@ -187,19 +124,22 @@ export default function RegistrationScreen() {
               <Text style={styles.textShow}>Показати</Text>
             </TouchableOpacity>
           </View>
+
           <View>
             <TouchableOpacity
-              style={styles.btnReg}
-              title="Registration"
-              onPress={onRegistration}
+              style={styles.btnAuth}
+              title="Login"
+              onPress={onLogin}
             >
-              <Text style={styles.txtBtnReg}>Зареєстуватися</Text>
+              <Text style={styles.txtBtnAuth}>Увійти</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => navigation.navigate("LoginScreen")}
+              style={styles.reBtnReg}
+              onPress={() => navigation.navigate("RegistrationScreen")}
             >
-              <Text style={styles.txtBtnAuth}>Вже є акаунт? Увійти</Text>
+              <Text style={styles.txtBtnAuth1}>Немає акаунту?</Text>
+              <Text style={styles.txtBtnAuth2}>Зареєструватися</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -213,13 +153,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
   },
-  blockReg: {
+  authBlock: {
     position: "relative",
     top: 200,
     height: 549,
     width: "auto",
+    paddingTop: 32,
     paddingRight: 16,
-    paddingBottom: 45,
+    paddingBottom: 32,
     paddingLeft: 16,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
@@ -227,43 +168,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
   },
-  avatar: {
-    top: -55,
-    width: 120,
-    height: 120,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#F6F6F6",
+  divTextAuth: {
+    marginBottom: 33,
   },
-  avatarImage: {
-    width: 120,
-    height: 120,
-
-    borderWidth: 2,
-  },
-  avaBtn: {
-    position: "absolute",
-    top: 70,
-    left: 105,
-    width: 30,
-    height: 30,
-    justifyContent: "center",
-  },
-  avaBtnSvg: {
-    textAlign: "center",
-  },
-  divTextReg: {
-    top: -33,
-  },
-  textReg: {
+  textAuth: {
     fontFamily: "Roboto_500Medium",
     fontSize: 30,
     textAlign: "center",
     color: "#212121",
     letterSpacing: 0.3,
   },
-  regInput: {
+  authInput: {
     width: 343,
     height: 50,
     borderRadius: 8,
@@ -285,7 +200,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#1B4371",
   },
-  btnReg: {
+  btnAuth: {
     flexDirection: "column",
     justifyContent: "flex-start",
     alignItems: "center",
@@ -299,33 +214,40 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     backgroundColor: "#FF6C00",
   },
-  txtBtnReg: {
+  txtBtnAuth: {
     fontFamily: "Roboto_400Regular",
     fontSize: 16,
     textAlign: "center",
     color: "#fff",
   },
-  txtBtnAuth: {
+  reBtnReg: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  txtBtnAuth1: {
     fontFamily: "Roboto_400Regular",
     fontSize: 16,
     textAlign: "center",
     color: "#1B4371",
+    marginRight: 5,
   },
-  errorLogin: {
+  txtBtnAuth2: {
+    fontFamily: "Roboto_400Regular",
+    fontSize: 16,
+    textAlign: "center",
+    color: "#1B4371",
+    textDecorationLine: "underline",
+  },
+  errorMail: {
     position: "absolute",
     top: 49,
     left: 16,
     color: "red",
   },
-  errorMail: {
-    position: "absolute",
-    top: 115,
-    left: 16,
-    color: "red",
-  },
   errorPass: {
     position: "absolute",
-    top: 180,
+    top: 115,
     left: 16,
     color: "red",
   },

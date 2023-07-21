@@ -6,8 +6,8 @@ import React from "react";
 
 // You can import from local files
 
-import RegistrationScreen from "./Screens/RegistrationScreen";
-import LoginScreen from "./Screens/LoginScreen";
+import RegistrationScreen from "./Screens/auth/RegistrationScreen";
+import LoginScreen from "./Screens/auth/LoginScreen";
 import Home from "./Screens/Home";
 
 // or any pure javascript modules available in npm

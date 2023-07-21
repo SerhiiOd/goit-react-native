@@ -1,32 +1,40 @@
 import React from "react";
-import { View, Text, Image } from "react-native";
+import { StyleSheet, View, Text, Image, FlatList } from "react-native";
 
 export default function PostsScreen({ route }) {
-  const { photoUri, text, locationText } = route.params || {};
+  const { posts } = route.params || [];
 
-  return (
+  const renderPost = ({ item }) => (
     <View>
-      {photoUri && (
+      {item.photoUri && (
         <View>
           <Text>Фотография:</Text>
           <Image
-            source={{ uri: photoUri }}
+            source={{ uri: item.photoUri }}
             style={{ width: 200, height: 200 }}
           />
         </View>
       )}
-      {text && (
+      {item.text && (
         <View>
           <Text>Текст:</Text>
-          <Text>{text}</Text>
+          <Text>{item.text}</Text>
         </View>
       )}
-      {locationText && (
+      {item.locationText && (
         <View>
           <Text>Локация:</Text>
-          <Text>{locationText}</Text>
+          <Text>{item.locationText}</Text>
         </View>
       )}
     </View>
+  );
+
+  return (
+    <FlatList
+      data={posts}
+      renderItem={renderPost}
+      keyExtractor={(item, index) => index.toString()}
+    />
   );
 }

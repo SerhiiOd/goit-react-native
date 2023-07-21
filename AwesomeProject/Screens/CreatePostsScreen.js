@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   Text,
   KeyboardAvoidingView,
+  TouchableWithoutFeedback,
   Image,
+  Keyboard,
   Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -24,12 +26,13 @@ export default function CreatePostsScreen() {
   const [photoUri, setPhotoUri] = useState(null);
   const [locationText, setLocationText] = useState("");
   const [hasPermission, setHasPermission] = useState(null);
-  const cameraRef = useRef(null);
   const [cameraType, setCameraType] = useState(Camera.Constants.Type.back);
   const [isTakingPhoto, setIsTakingPhoto] = useState(false);
   const [isPhotoSelected, setIsPhotoSelected] = useState(false);
+  const [posts, setPosts] = useState([]);
 
   const navigation = useNavigation();
+  const cameraRef = useRef(null);
 
   useEffect(() => {
     (async () => {
@@ -140,125 +143,134 @@ export default function CreatePostsScreen() {
 
   const handlePublishButtonPress = () => {
     if (photoUri || text || locationText) {
-      navigation.navigate("PostsScreen", {
+      const newPost = {
         photoUri,
         text,
         locationText,
-      });
+      };
+
+      setPosts([...posts, newPost]);
 
       setText("");
       setPhotoUri(null);
       setLocationText("");
       setIsPhotoSelected(false);
       setIsTakingPhoto(false);
+
+      navigation.navigate("PostsScreen", { posts: [...posts, newPost] });
     } else {
       console.log("Please fill in the required fields.");
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerBlock}>
-        <TouchableOpacity
-          style={styles.backBlock}
-          onPress={() => navigation.navigate("PostsScreen")}
-        >
-          <AntDesign name="arrowleft" size={24} color="#212121" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Створити публікацію</Text>
-      </View>
-      <View style={styles.photoBlock}>
-        {!isPhotoSelected ? (
-          <View style={styles.cameraBlock}>
-            <Camera
-              style={styles.camera}
-              type={cameraType}
-              ref={cameraRef}
-            ></Camera>
-            <View style={styles.photoView}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <View style={styles.headerBlock}>
+          <TouchableOpacity
+            style={styles.backBlock}
+            onPress={() => navigation.navigate("PostsScreen")}
+          >
+            <AntDesign name="arrowleft" size={24} color="#212121" />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>Створити публікацію</Text>
+        </View>
+        <View style={styles.photoBlock}>
+          {!isPhotoSelected ? (
+            <View style={styles.cameraBlock}>
+              <Camera
+                style={styles.camera}
+                type={cameraType}
+                ref={cameraRef}
+              ></Camera>
+              <View style={styles.photoView}>
+                <TouchableOpacity
+                  style={styles.buttonCam}
+                  onPress={handleCameraButtonPress}
+                >
+                  <FontAwesome name="camera" size={24} color="#BDBDBD" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.photoContainer}>
+              <Image source={{ uri: photoUri }} style={styles.photo} />
               <TouchableOpacity
-                style={styles.buttonCam}
-                onPress={handleCameraButtonPress}
+                style={styles.retakeButton}
+                onPress={retakePhoto}
               >
                 <FontAwesome name="camera" size={24} color="#BDBDBD" />
               </TouchableOpacity>
             </View>
-          </View>
-        ) : (
-          <View style={styles.photoContainer}>
-            <Image source={{ uri: photoUri }} style={styles.photo} />
-            <TouchableOpacity style={styles.retakeButton} onPress={retakePhoto}>
-              <FontAwesome name="camera" size={24} color="#BDBDBD" />
+          )}
+          {isPhotoSelected ? (
+            <TouchableOpacity style={styles.btnLoad} onPress={uploadPhoto}>
+              <Text style={styles.textLoad}>Редагувати фото</Text>
             </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.btnLoad} onPress={uploadPhoto}>
+              <Text style={styles.textLoad}>Завантажте фото</Text>
+            </TouchableOpacity>
+          )}
+          <View style={styles.namePhotoBlock}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS == "ios" ? "padding" : "height"}
+              style={styles.keyboardInp}
+            >
+              <TextInput
+                style={styles.namePhoto}
+                value={text}
+                placeholder="Назва..."
+                onChangeText={setText}
+              />
+            </KeyboardAvoidingView>
           </View>
-        )}
-        {isPhotoSelected ? (
-          <TouchableOpacity style={styles.btnLoad} onPress={uploadPhoto}>
-            <Text style={styles.textLoad}>Редагувати фото</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={styles.btnLoad} onPress={uploadPhoto}>
-            <Text style={styles.textLoad}>Завантажте фото</Text>
-          </TouchableOpacity>
-        )}
-        <View style={styles.namePhotoBlock}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS == "ios" ? "padding" : "height"}
-            style={styles.keyboardInp}
+          <View style={styles.nameLocBlock}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS == "ios" ? "padding" : "height"}
+              style={styles.keyboardInp}
+            >
+              <TextInput
+                style={styles.nameLoc}
+                value={locationText}
+                placeholder="Локація..."
+                onChangeText={setLocationText}
+              />
+              <TouchableOpacity
+                style={styles.iconLocBtn}
+                onPress={handleLocationIconPress}
+              >
+                <Feather
+                  name="map-pin"
+                  size={24}
+                  color="#BDBDBD"
+                  style={styles.iconLoc}
+                />
+              </TouchableOpacity>
+            </KeyboardAvoidingView>
+          </View>
+          <TouchableOpacity
+            style={styles.loadBtn}
+            onPress={handlePublishButtonPress}
           >
-            <TextInput
-              style={styles.namePhoto}
-              value={text}
-              placeholder="Назва..."
-              onChangeText={setText}
-            />
-          </KeyboardAvoidingView>
-        </View>
-        <View style={styles.nameLocBlock}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS == "ios" ? "padding" : "height"}
-            style={styles.keyboardInp}
-          >
-            <TextInput
-              style={styles.nameLoc}
-              value={locationText}
-              placeholder="Локація..."
-              onChangeText={setLocationText}
-            />
+            <Text style={styles.loadText}>Опубліковати</Text>
+          </TouchableOpacity>
+          <View style={styles.delBlock}>
             <TouchableOpacity
-              style={styles.iconLocBtn}
-              onPress={handleLocationIconPress}
+              style={styles.delBtn}
+              onPress={handleDeleteAllFields}
             >
               <Feather
-                name="map-pin"
+                name="trash-2"
                 size={24}
                 color="#BDBDBD"
-                style={styles.iconLoc}
+                style={styles.delIcon}
               />
             </TouchableOpacity>
-          </KeyboardAvoidingView>
-        </View>
-        <TouchableOpacity
-          style={styles.loadBtn}
-          onPress={handlePublishButtonPress}
-        >
-          <Text style={styles.loadText}>Опубліковати</Text>
-        </TouchableOpacity>
-        <View style={styles.delBlock}>
-          <TouchableOpacity
-            style={styles.delBtn}
-            onPress={handleDeleteAllFields}
-          >
-            <Feather
-              name="trash-2"
-              size={24}
-              color="#BDBDBD"
-              style={styles.delIcon}
-            />
-          </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 

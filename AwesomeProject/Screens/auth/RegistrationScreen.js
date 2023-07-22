@@ -70,16 +70,19 @@ export default function RegistrationScreen() {
         return;
       }
 
-      const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      });
+      if (avatar) {
+        setAvatar(null);
+      } else {
+        const pickerResult = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 1,
+        });
 
-      if (!pickerResult.canceled) {
-        // Обновляем состояние с выбранным изображением
-        setAvatar(pickerResult.assets[0].uri); // используем "assets" массив
+        if (!pickerResult.canceled) {
+          setAvatar(pickerResult.assets[0].uri);
+        }
       }
     } catch (error) {
       console.log("Ошибка выбора изображения:", error);
@@ -126,17 +129,23 @@ export default function RegistrationScreen() {
         />
         <View style={styles.blockReg}>
           <View style={styles.avatar}>
-            {/* Здесь отображается выбранная аватарка или дефолтное изображение */}
             {avatar ? (
               <Image source={{ uri: avatar }} style={styles.avatarImage} />
             ) : null}
 
-            {/* Кнопка для выбора аватарки */}
             <TouchableOpacity
-              style={styles.avaBtn}
+              // style={styles.avaBtn}
               onPress={handleAvatarSelect}
             >
-              <AntDesign name="pluscircleo" size={24} color="#FF6C00" />
+              {avatar ? (
+                <View style={styles.avaDell}>
+                  <AntDesign name="pluscircleo" size={24} color="#BDBDBD" />
+                </View>
+              ) : (
+                <View style={styles.avaAdd}>
+                  <AntDesign name="pluscircleo" size={24} color="#FF6C00" />
+                </View>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -239,16 +248,26 @@ const styles = StyleSheet.create({
   avatarImage: {
     width: 120,
     height: 120,
-
-    borderWidth: 2,
+    borderRadius: 16,
   },
-  avaBtn: {
+  avaAdd: {
     position: "absolute",
-    top: 70,
-    left: 105,
+    top: -3,
+    left: 45,
     width: 30,
     height: 30,
+    alignItems: "center",
     justifyContent: "center",
+  },
+  avaDell: {
+    position: "absolute",
+    left: 45,
+    bottom: 33,
+    width: 30,
+    height: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    transform: "rotate(-45deg)",
   },
   avaBtnSvg: {
     textAlign: "center",

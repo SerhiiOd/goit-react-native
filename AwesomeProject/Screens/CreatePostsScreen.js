@@ -11,7 +11,7 @@ import {
   Keyboard,
   Dimensions,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, CommonActions } from "@react-navigation/native";
 import { AntDesign, FontAwesome, Feather } from "@expo/vector-icons";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
@@ -30,6 +30,9 @@ export default function CreatePostsScreen() {
   const [isTakingPhoto, setIsTakingPhoto] = useState(false);
   const [isPhotoSelected, setIsPhotoSelected] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [notification, setNotification] = useState(null);
+  const [textError, setTextError] = useState(false);
+  const [locationError, setLocationError] = useState(false);
 
   const navigation = useNavigation();
   const cameraRef = useRef(null);
@@ -56,7 +59,15 @@ export default function CreatePostsScreen() {
         longitude: location.coords.longitude,
       });
 
-      let address = `${geocode[0].city}, ${geocode[0].street}`;
+      // Извлечение города и области (если доступно) из ответа геокодирования
+      let city = geocode[0].city;
+      let region = geocode[0].region;
+
+      // Объединение города и области в текст локации
+      let address = city;
+      if (region) {
+        address += `, ${region}`;
+      }
 
       setLocationText(address);
     })();
@@ -133,16 +144,36 @@ export default function CreatePostsScreen() {
         longitude: location.coords.longitude,
       });
 
-      let address = `${geocode[0].city}, ${geocode[0].street}`;
+      // Извлечение города и области (если доступно) из ответа геокодирования
+      let city = geocode[0].city;
+      let region = geocode[0].region;
+
+      // Объединение города и области в текст локации
+      let address = city;
+      if (region) {
+        address += `, ${region}`;
+      }
 
       setLocationText(address);
     } catch (error) {
-      console.error("Error while fetching location:", error);
+      console.error("Ошибка при получении локации:", error);
     }
   };
 
   const handlePublishButtonPress = () => {
-    if (photoUri || text || locationText) {
+    if (!text) {
+      setTextError(true);
+    } else {
+      setTextError(false);
+    }
+
+    if (!locationText) {
+      setLocationError(true);
+    } else {
+      setLocationError(false);
+    }
+
+    if (photoUri && text && locationText) {
       const newPost = {
         photoUri,
         text,
@@ -159,8 +190,22 @@ export default function CreatePostsScreen() {
 
       navigation.navigate("PostsScreen", { posts: [...posts, newPost] });
     } else {
-      console.log("Please fill in the required fields.");
+      setNotification("Пожалуйста, заполните все поля перед публикацией.");
     }
+  };
+
+  const handleBackButtonPress = () => {
+    // Сбрасываем состояние формы и фото
+    setText("");
+    setPhotoUri(null);
+    setLocationText("");
+    setIsPhotoSelected(false);
+    setIsTakingPhoto(false);
+
+    // Выполняем переход на нужный экран
+    navigation.dispatch(
+      CommonActions.navigate("PostsScreen", { posts: [...posts] })
+    );
   };
 
   return (
@@ -169,7 +214,7 @@ export default function CreatePostsScreen() {
         <View style={styles.headerBlock}>
           <TouchableOpacity
             style={styles.backBlock}
-            onPress={() => navigation.navigate("PostsScreen")}
+            onPress={handleBackButtonPress}
           >
             <AntDesign name="arrowleft" size={24} color="#212121" />
           </TouchableOpacity>
@@ -223,6 +268,9 @@ export default function CreatePostsScreen() {
                 placeholder="Назва..."
                 onChangeText={setText}
               />
+              {textError && (
+                <Text style={styles.errorText}>Поле должно быть заполнено</Text>
+              )}
             </KeyboardAvoidingView>
           </View>
           <View style={styles.nameLocBlock}>
@@ -236,6 +284,9 @@ export default function CreatePostsScreen() {
                 placeholder="Локація..."
                 onChangeText={setLocationText}
               />
+              {locationError && (
+                <Text style={styles.errorText}>Поле должно быть заполнено</Text>
+              )}
               <TouchableOpacity
                 style={styles.iconLocBtn}
                 onPress={handleLocationIconPress}
@@ -372,6 +423,11 @@ const styles = StyleSheet.create({
     width: 28,
     alignItems: "center",
     justifyContent: "center",
+  },
+  errorText: {
+    fontFamily: "Roboto_400Regular",
+    fontSize: 16,
+    color: "red",
   },
   loadBtn: {
     paddingTop: 16,

@@ -1,34 +1,45 @@
 import React from "react";
-import { StyleSheet, View, Text, Image, FlatList } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
+import { Feather } from "@expo/vector-icons";
 
 export default function PostsScreen({ route }) {
   const { posts } = route.params || [];
 
   const renderPost = ({ item }) => (
-    <View>
+    <View style={styles.container}>
       {item.photoUri && (
-        <View>
-          <Text>Фотография:</Text>
-          <Image
-            source={{ uri: item.photoUri }}
-            style={{ width: 200, height: 200 }}
-          />
+        <View style={styles.blockImg}>
+          <Image source={{ uri: item.photoUri }} style={styles.images} />
         </View>
       )}
       {item.text && (
-        <View>
-          <Text>Текст:</Text>
+        <View style={styles.blockText}>
           <Text>{item.text}</Text>
         </View>
       )}
+      <View style={styles.blockSms}>
+        <TouchableOpacity>
+          <Feather name="message-circle" size={24} color="#BDBDBD" />
+        </TouchableOpacity>
+      </View>
       {item.locationText && (
-        <View>
-          <Text>Локация:</Text>
+        <View style={styles.blockLoc}>
+          <TouchableOpacity>
+            <Feather name="map-pin" size={24} color="#BDBDBD" />
+          </TouchableOpacity>
           <Text>{item.locationText}</Text>
         </View>
       )}
     </View>
   );
+  // console.log(posts);
 
   return (
     <FlatList
@@ -38,3 +49,26 @@ export default function PostsScreen({ route }) {
     />
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingTop: 34,
+    paddingRight: 16,
+    paddingLeft: 16,
+  },
+  blockImg: {
+    // marginBottom: 8,
+  },
+  images: {
+    height: 240,
+    borderRadius: 8,
+  },
+  blockText: {
+    // marginBottom: 8,
+  },
+  blockLoc: {
+    // flexDirection: "row",
+    // alignItems: "center",
+    // justifyContent: "flex-end",
+  },
+});

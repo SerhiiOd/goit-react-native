@@ -15,7 +15,6 @@ import {
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
-import { registerUser } from "../../Memory/Memory";
 import * as ImagePicker from "expo-image-picker";
 
 const imageBg = require("../../assets/images/photo-bg.png");
@@ -95,20 +94,19 @@ export default function RegistrationScreen() {
 
   const onRegistration = () => {
     if (validateForm()) {
+      // Предположим, у вас есть функция для отправки данных на сервер или сохранения в базу данных.
+      // Здесь вы можете вызвать вашу функцию для регистрации пользователя и передать данные:
       const registrationData = {
         login,
         mail,
-        password,
-        avatar, // Включаем выбранный аватар в данные регистрации
+        avatar,
       };
 
-      if (registerUser(login, mail, password)) {
-        Alert.alert("Пользователь успешно зарегистрирован.");
-        navigation.navigate("Home");
-      } else {
-        Alert.alert("Пользователь с таким логином или почтой уже существует.");
-        setPassword("");
-      }
+      // Примените вашу логику отправки данных на сервер для регистрации пользователя
+      // В данном примере, просто симулируем успешную регистрацию через setTimeout
+      setTimeout(() => {
+        navigation.navigate("Home", { avatar, login, mail });
+      }, 1000); // Здесь вы можете использовать реальный запрос на сервер, а не setTimeout
     } else {
       Alert.alert("Форма не прошла валидацию. Пожалуйста, исправьте ошибки.");
       setPassword("");
@@ -133,10 +131,7 @@ export default function RegistrationScreen() {
               <Image source={{ uri: avatar }} style={styles.avatarImage} />
             ) : null}
 
-            <TouchableOpacity
-              // style={styles.avaBtn}
-              onPress={handleAvatarSelect}
-            >
+            <TouchableOpacity onPress={handleAvatarSelect}>
               {avatar ? (
                 <View style={styles.avaDell}>
                   <AntDesign name="pluscircleo" size={24} color="#BDBDBD" />
@@ -267,10 +262,7 @@ const styles = StyleSheet.create({
     height: 30,
     alignItems: "center",
     justifyContent: "center",
-    transform: "rotate(-45deg)",
-  },
-  avaBtnSvg: {
-    textAlign: "center",
+    transform: [{ rotate: "-45deg" }],
   },
   divTextReg: {
     top: -33,

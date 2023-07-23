@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   StyleSheet,
   View,
@@ -11,9 +12,7 @@ import {
   Platform,
   Alert,
 } from "react-native";
-import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { loginUser } from "../../Memory/Memory";
 
 const imageBg = require("../../assets/images/photo-bg.png");
 
@@ -57,16 +56,9 @@ export default function LoginScreen() {
 
   const onLogin = () => {
     if (validateForm()) {
-      const user = loginUser(mail, password);
-      if (user) {
-        console.log("Пользователь успешно вошел в систему:", user);
-        navigation.navigate("Home");
-      } else {
-        Alert.alert(
-          "Неверные данные. Пожалуйста, проверьте введенный адрес электронной почты и пароль."
-        );
-        setPassword("");
-      }
+      // Здесь должна быть логика для проверки пользователя и входа
+      // Если пользователь успешно вошел в систему, можно перейти на другой экран
+      navigation.navigate("Home");
     } else {
       Alert.alert("Форма не прошла валидацию. Пожалуйста, исправьте ошибки.");
       setPassword("");

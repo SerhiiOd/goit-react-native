@@ -21,22 +21,25 @@ export default function PostsScreen({ route }) {
       )}
       {item.text && (
         <View style={styles.blockText}>
-          <Text>{item.text}</Text>
+          <Text style={styles.textName}>{item.text}</Text>
         </View>
       )}
-      <View style={styles.blockSms}>
-        <TouchableOpacity>
-          <Feather name="message-circle" size={24} color="#BDBDBD" />
-        </TouchableOpacity>
-      </View>
-      {item.locationText && (
-        <View style={styles.blockLoc}>
-          <TouchableOpacity>
-            <Feather name="map-pin" size={24} color="#BDBDBD" />
+      <View style={styles.smsLoc}>
+        <View style={styles.blockSms}>
+          <TouchableOpacity style={styles.btnSms}>
+            <Feather name="message-circle" size={24} color="#BDBDBD" />
           </TouchableOpacity>
-          <Text>{item.locationText}</Text>
+          <Text style={styles.numSms}>0</Text>
         </View>
-      )}
+        {item.locationText && (
+          <View style={styles.blockLoc}>
+            <TouchableOpacity style={styles.btnLoc}>
+              <Feather name="map-pin" size={24} color="#BDBDBD" />
+            </TouchableOpacity>
+            <Text style={styles.textLoc}>{item.locationText}</Text>
+          </View>
+        )}
+      </View>
     </View>
   );
   // console.log(posts);
@@ -56,19 +59,47 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     paddingLeft: 16,
   },
-  blockImg: {
-    // marginBottom: 8,
-  },
   images: {
     height: 240,
     borderRadius: 8,
+    marginBottom: 8,
   },
   blockText: {
-    // marginBottom: 8,
+    marginBottom: 8,
+  },
+  textName: {
+    fontFamily: "Roboto_500Medium",
+    fontSize: 16,
+    color: "#212121",
+  },
+  smsLoc: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  blockSms: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  btnSms: {
+    marginRight: 6,
+  },
+  numSms: {
+    fontFamily: "Roboto_400Regular",
+    fontSize: 16,
+    color: "#BDBDBD",
   },
   blockLoc: {
-    // flexDirection: "row",
-    // alignItems: "center",
-    // justifyContent: "flex-end",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  btnLoc: {
+    marginRight: 6,
+  },
+  textLoc: {
+    fontFamily: "Roboto_400Regular",
+    fontSize: 16,
+    color: "#212121",
+    textDecorationLine: "underline",
   },
 });

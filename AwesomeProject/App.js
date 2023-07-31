@@ -9,6 +9,8 @@ import React from "react";
 import RegistrationScreen from "./Screens/auth/RegistrationScreen";
 import LoginScreen from "./Screens/auth/LoginScreen";
 import Home from "./Screens/Home";
+import CommentsScreen from "./Screens/CommentsScreen";
+import MapScreen from "./Screens/MapScreen";
 
 // or any pure javascript modules available in npm
 
@@ -40,6 +42,16 @@ export default function App() {
         <MainStack.Screen
           name="Home"
           component={Home}
+          options={{ headerShown: false }}
+        />
+        <MainStack.Screen
+          name="CommentsScreen"
+          component={CommentsScreen}
+          options={{ headerShown: false }}
+        />
+        <MainStack.Screen
+          name="MapScreen"
+          component={MapScreen}
           options={{ headerShown: false }}
         />
       </MainStack.Navigator>

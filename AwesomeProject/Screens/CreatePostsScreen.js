@@ -33,6 +33,7 @@ export default function CreatePostsScreen() {
   const [notification, setNotification] = useState(null);
   const [textError, setTextError] = useState(false);
   const [locationError, setLocationError] = useState(false);
+  const [manualLocation, setManualLocation] = useState("");
 
   const navigation = useNavigation();
   const cameraRef = useRef(null);
@@ -131,32 +132,33 @@ export default function CreatePostsScreen() {
   };
 
   const handleLocationIconPress = async () => {
-    try {
+    if (!locationText) {
+      // Запросите разрешение на доступ к местоположению
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        console.log("Permission to access location was denied");
+        console.log("Доступ к местоположению отклонен");
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-      let geocode = await Location.reverseGeocodeAsync({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
+      // Получите текущее местоположение и обновите состояние locationText
+      try {
+        let location = await Location.getCurrentPositionAsync({});
+        let geocode = await Location.reverseGeocodeAsync({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
 
-      // Извлечение города и области (если доступно) из ответа геокодирования
-      let city = geocode[0].city;
-      let region = geocode[0].region;
+        let city = geocode[0].city;
+        let region = geocode[0].region;
+        let address = city;
+        if (region) {
+          address += `, ${region}`;
+        }
 
-      // Объединение города и области в текст локации
-      let address = city;
-      if (region) {
-        address += `, ${region}`;
+        setLocationText(address);
+      } catch (error) {
+        console.error("Ошибка при получении местоположения:", error);
       }
-
-      setLocationText(address);
-    } catch (error) {
-      console.error("Ошибка при получении локации:", error);
     }
   };
 
